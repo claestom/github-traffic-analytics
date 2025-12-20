@@ -5,6 +5,14 @@
 
 param($myTimer)
 
+# Authenticate to Azure using the Function App's managed identity
+try {
+    Connect-AzAccount -Identity | Out-Null
+    Write-Host "Authenticated to Azure via managed identity" -ForegroundColor Green
+} catch {
+    Write-Warning "Managed identity authentication failed: $($_.Exception.Message)"
+}
+
 # Get environment variables (from Function App settings)
 $GitHubToken = $env:GITHUB_TOKEN
 $GitHubUsername = $env:GITHUB_USERNAME
