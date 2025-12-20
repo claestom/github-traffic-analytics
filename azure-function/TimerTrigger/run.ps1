@@ -13,6 +13,19 @@ try {
     Write-Warning "Managed identity authentication failed: $($_.Exception.Message)"
 }
 
+# Ensure subscription context is set for Az cmdlets
+$subscriptionId = $env:AZURE_SUBSCRIPTION_ID
+if ($subscriptionId) {
+    try {
+        Set-AzContext -Subscription $subscriptionId | Out-Null
+        Write-Host "Set Az context to subscription: $subscriptionId" -ForegroundColor Green
+    } catch {
+        Write-Warning "Failed to set Az context: $($_.Exception.Message)"
+    }
+} else {
+    Write-Warning "AZURE_SUBSCRIPTION_ID not set; Az cmdlets may fail without context"
+}
+
 # Get environment variables (from Function App settings)
 $GitHubToken = $env:GITHUB_TOKEN
 $GitHubUsername = $env:GITHUB_USERNAME
@@ -59,7 +72,19 @@ try {
     Write-Host "Collecting data for date: $targetDate" -ForegroundColor Yellow
     
     # Get storage account context using managed identity
-    $storageContext = New-AzStorageContext -StorageAccountName $StorageAccountName -UseConnectedAccount
+    try {
+        $storageContext = New-AzStorageContext -StorageAccountName $StorageAccountName -UseConnectedAccount
+    } catch {
+        Write-Warning "UseConnectedAccount failed: $($_.Exception.Message). Retrying after refreshing context..."
+        # Try to refresh context and retry once
+        try {
+            Connect-AzAccount -Identity | Out-Null
+            if ($subscriptionId) { Set-AzContext -Subscription $subscriptionId | Out-Null }
+            $storageContext = New-AzStorageContext -StorageAccountName $StorageAccountName -UseConnectedAccount
+        } catch {
+            throw $_
+        }
+    }
     
     # Download existing CSV from storage if it exists
     $existingData = @{}

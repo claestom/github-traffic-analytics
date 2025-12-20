@@ -154,6 +154,15 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
           name: 'XDT_MicrosoftApplicationInsights_Mode'
           value: 'default'
         }
+        // Managed Identity configuration for user-assigned identity
+        {
+          name: 'AZURE_CLIENT_ID'
+          value: managedIdentity.properties.clientId
+        }
+        {
+          name: 'AZURE_SUBSCRIPTION_ID'
+          value: subscription().subscriptionId
+        }
         // GitHub Configuration
         {
           name: 'GITHUB_TOKEN'
@@ -189,4 +198,5 @@ output functionAppId string = functionApp.id
 output containerName string = containerName
 output managedIdentityId string = managedIdentity.id
 output managedIdentityPrincipalId string = managedIdentity.properties.principalId
+output managedIdentityClientId string = managedIdentity.properties.clientId
 output applicationInsightsInstrumentationKey string = applicationInsights.properties.InstrumentationKey
