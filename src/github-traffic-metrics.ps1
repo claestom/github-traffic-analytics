@@ -11,38 +11,27 @@ param(
     [string]$GitHubToken,
     
     [Parameter(Mandatory=$false)]
-    [string]$GitHubUsername,
-    
-    [Parameter(Mandatory=$false)]
-    [string]$ReposJsonFile,
-    
-    [Parameter(HelpMessage="Use repository filter from JSON file")]
-    [switch]$UseRepoFilter = $false
+    [string]$GitHubUsername
 )
 
-# Function to load .env file
-function Import-DotEnv {
-    param([string]$Path = ".env")
-    
-    $envPath = Join-Path $PSScriptRoot $Path
-    if (-not (Test-Path $envPath)) {
-        return $false
-    }
-    
+# Load configuration from .env file
+$envPath = Join-Path (Split-Path $PSScriptRoot -Parent) ".env"
+if (-not (Test-Path $envPath)) {
+    $envPath = Join-Path $PSScriptRoot "..\\.env"
+}
+
+$envLoaded = $false
+if (Test-Path $envPath) {
+    $envLoaded = $true
     Get-Content $envPath | ForEach-Object {
         if ($_ -match '^([^#][^=]+)=(.*)$') {
             $name = $matches[1].Trim()
             $value = $matches[2].Trim()
-            # Remove quotes if present
             $value = $value -replace '^["''](.*)[""'']$', '$1'
             Set-Variable -Name $name -Value $value -Scope Script
         }
     }
-    return $true
 }
-
-# Load configuration from .env file
-$envLoaded = Import-DotEnv
 
 # Use .env values if parameters not provided
 if (-not $GitHubToken -and $envLoaded -and $GITHUB_TOKEN) {
@@ -53,10 +42,6 @@ if (-not $GitHubToken -and $envLoaded -and $GITHUB_TOKEN) {
 if (-not $GitHubUsername -and $envLoaded -and $GITHUB_USERNAME) {
     $GitHubUsername = $GITHUB_USERNAME
     Write-Host "Using GitHub username from .env file" -ForegroundColor Green
-}
-
-if (-not $ReposJsonFile -and $envLoaded -and $REPO_FILTER_FILE) {
-    $ReposJsonFile = $REPO_FILTER_FILE
 }
 
 # Validate required parameters
@@ -71,12 +56,7 @@ if (-not $GitHubUsername) {
 }
 
 # Create outputs directory if it doesn't exist
-$outputDir = if ($envLoaded -and $OUTPUT_DIR) { 
-    Join-Path $PSScriptRoot $OUTPUT_DIR
-} else { 
-    Join-Path $PSScriptRoot "..\outputs"
-}
-
+$outputDir = Join-Path (Split-Path $PSScriptRoot -Parent) "outputs"
 if (-not (Test-Path $outputDir)) {
     New-Item -ItemType Directory -Path $outputDir -Force | Out-Null
 }
@@ -112,35 +92,6 @@ try {
     $repositories = Invoke-RestMethod -Uri $reposUrl -Headers $headers -Method Get
     
     $publicRepos = $repositories | Where-Object { $_.private -eq $false -and $_.owner.login -eq $GitHubUsername -and $_.fork -eq $false }
-    
-    # Filter repositories if JSON file is provided and UseRepoFilter is enabled
-    if ($UseRepoFilter -and $ReposJsonFile) {
-        Write-Host "Repository filter enabled: $ReposJsonFile" -ForegroundColor Yellow
-        if (Test-Path $ReposJsonFile) {
-            Write-Host "Loading repository filter from: $ReposJsonFile" -ForegroundColor Yellow
-            try {
-                $repoFilter = Get-Content $ReposJsonFile -Raw | ConvertFrom-Json
-                $filteredRepoNames = $repoFilter.repositories
-                Write-Host "Filter contains $($filteredRepoNames.Count) repository names: $($filteredRepoNames -join ', ')" -ForegroundColor Gray
-                $originalCount = $publicRepos.Count
-                $publicRepos = $publicRepos | Where-Object { $_.name -in $filteredRepoNames }
-                Write-Host "Filtered from $originalCount to $($publicRepos.Count) repositories based on JSON file" -ForegroundColor Cyan
-            } catch {
-                Write-Warning "Failed to load repository filter from JSON file: $($_.Exception.Message)"
-                Write-Host "Proceeding with all repositories" -ForegroundColor Yellow
-            }
-        } else {
-            Write-Warning "Repository filter file not found: $ReposJsonFile"
-            Write-Host "Proceeding with all repositories" -ForegroundColor Yellow
-        }
-    } elseif ($UseRepoFilter -and -not $ReposJsonFile) {
-        Write-Warning "UseRepoFilter is enabled but no ReposJsonFile provided"
-        Write-Host "Proceeding with all repositories" -ForegroundColor Yellow
-    } else {
-        if (-not $UseRepoFilter) {
-            Write-Host "Repository filtering disabled, processing all repositories" -ForegroundColor Gray
-        }
-    }
     
     Write-Host "Processing $($publicRepos.Count) repositories" -ForegroundColor Cyan
     
