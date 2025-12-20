@@ -1,0 +1,22 @@
+{
+  "version": "2.0",
+  "logging": {
+    "applicationInsights": {
+      "samplingSettings": {
+        "isEnabled": true,
+        "percentToSample": 100.0,
+        "minSamplingRate": 0.1,
+        "maxSamplingRate": 0.1,
+        "movingAverageRatio": 0.25
+      }
+    }
+  },
+  "extensionBundle": {
+    "id": "Microsoft.Azure.Functions.ExtensionBundle",
+    "version": "[4.*, 5.0.0)"
+  },
+  "functionTimeout": "00:10:00",
+  "managedDependency": {
+    "enabled": true
+  }
+}

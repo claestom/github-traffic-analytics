@@ -1,0 +1,17 @@
+{
+  "name": "github-metrics-tracker",
+  "version": "1.0.0",
+  "description": "GitHub metrics tracker Azure Function",
+  "main": "index.js",
+  "scripts": {
+    "dev": "func start",
+    "build": "tsc"
+  },
+  "keywords": [
+    "github",
+    "metrics",
+    "azure-functions"
+  ],
+  "author": "",
+  "license": "MIT"
+}

@@ -27,3 +27,8 @@ build/
 
 # Outputs
 outputs/
+
+# Azure Function
+azure-function/.python_packages
+azure-function/obj/
+local.settings.json
