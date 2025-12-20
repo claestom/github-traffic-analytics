@@ -5,9 +5,19 @@
 
 param($myTimer)
 
+# Optional local debug: pause to allow attaching a debugger
+if ($env:ENABLE_DEBUG -eq 'true') {
+    Write-Host "ENABLE_DEBUG=true → Waiting for debugger attach..." -ForegroundColor Yellow
+    Wait-Debugger
+}
+
 # Authenticate to Azure using the Function App's managed identity
 try {
-    Connect-AzAccount -Identity | Out-Null
+    if ($env:AZURE_CLIENT_ID) {
+        Connect-AzAccount -Identity -AccountId $env:AZURE_CLIENT_ID | Out-Null
+    } else {
+        Connect-AzAccount -Identity | Out-Null
+    }
     Write-Host "Authenticated to Azure via managed identity" -ForegroundColor Green
 } catch {
     Write-Warning "Managed identity authentication failed: $($_.Exception.Message)"
@@ -75,14 +85,16 @@ try {
     try {
         $storageContext = New-AzStorageContext -StorageAccountName $StorageAccountName -UseConnectedAccount
     } catch {
-        Write-Warning "UseConnectedAccount failed: $($_.Exception.Message). Retrying after refreshing context..."
-        # Try to refresh context and retry once
+        Write-Warning "UseConnectedAccount failed: $($_.Exception.Message). Attempting token-based context..."
         try {
-            Connect-AzAccount -Identity | Out-Null
-            if ($subscriptionId) { Set-AzContext -Subscription $subscriptionId | Out-Null }
-            $storageContext = New-AzStorageContext -StorageAccountName $StorageAccountName -UseConnectedAccount
+            # Acquire an access token for Azure Storage resource
+            $storageToken = Get-AzAccessToken -ResourceUrl 'https://storage.azure.com/'
+            if (-not $storageToken.Token) { throw "Failed to acquire storage access token" }
+            $storageContext = New-AzStorageContext -StorageAccountName $StorageAccountName -Token $storageToken.Token
+            Write-Host "Established storage context using access token" -ForegroundColor Green
         } catch {
-            throw $_
+            Write-Error "Failed to create storage context: $($_.Exception.Message)"
+            throw
         }
     }
     
