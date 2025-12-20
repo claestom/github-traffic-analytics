@@ -25,6 +25,9 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   sku: {
     name: 'Standard_LRS'
   }
+  tags: {
+    SecurityControl: 'Ignore'
+  }
   properties: {
     accessTier: 'Hot'
     allowBlobPublicAccess: false
