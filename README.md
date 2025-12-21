@@ -11,6 +11,14 @@ Track GitHub repository traffic (views and clones) over time. Collects daily met
 
 ## Usage Options
 
+### Get the code
+
+```powershell
+# Clone and enter the repo
+git clone https://github.com/claestom/GitHub-metrics-tracker.git
+cd GitHub-metrics-tracker
+```
+
 ### Option 1: Local Script
 
 Run manually or via scheduled task on your local machine.
