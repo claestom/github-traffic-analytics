@@ -47,7 +47,7 @@ Deploy to Azure for fully automated daily collection at 11:50 PM CET.
 ```powershell
 # 1. Login and set variables
 az login
-$rg = "rg-ghmetrics-demo01"
+$rg = "<rg-name>"
 $location = "westeurope"
 
 # 2. Create resource group
@@ -62,7 +62,7 @@ az deployment group create `
 # 4. Get function app name from outputs
 $funcApp = az functionapp list -g $rg --query "[0].name" -o tsv
 
-# 5. Set GitHub credentials (create new PAT with repo scope)
+# 5. Set GitHub credentials in the Azure Functions config
 az functionapp config appsettings set -g $rg -n $funcApp `
   --settings GITHUB_TOKEN="ghp_new_token" GITHUB_USERNAME="your_username"
 
@@ -76,53 +76,3 @@ func azure functionapp publish $funcApp --nozip
 - Function App (PowerShell 7.4, Consumption plan)
 - User-Assigned Managed Identity (secure storage access)
 - Application Insights (monitoring)
-
-**Monitor:**
-```powershell
-# View logs
-az functionapp log tail -g $rg -n $funcApp
-
-# Download CSV
-az storage blob download --account-name <storage_name> `
-  --container-name metrics --name github-traffic-metrics.csv --file metrics.csv
-```
-
-**Clean up:**
-```powershell
-az group delete --name $rg --yes
-```
-
----
-
-## CSV Format
-
-```
-Repository,2025-12-01,2025-12-02,...,Total
-repo-name-1,5(2),3(1),...,8(3)
-repo-name-2,0(0),12(4),...,12(4)
-TOTAL,5(2),15(5),...,20(7)
-```
-- Format: `views(clones)`
-- TOTAL row: sum across all repositories per day
-
-## Repository Structure
-
-```
-├── src/                          # Local script
-│   └── github-traffic-metrics.ps1
-├── azure-function/               # Azure deployment
-│   ├── TimerTrigger/
-│   │   ├── run.ps1              # Function logic
-│   │   └── function.json        # Timer schedule
-│   ├── host.json
-│   └── requirements.psd1        # PowerShell modules
-├── infra/                        # Infrastructure as Code
-│   ├── main.bicep               # Azure resources
-│   └── main.bicepparam          # Parameters
-├── config/                       # Configuration samples
-└── outputs/                      # Local script output
-```
-
-## License
-
-MIT
