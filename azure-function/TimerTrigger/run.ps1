@@ -5,6 +5,15 @@
 
 param($myTimer)
 
+# Explicitly import required Az modules for this function
+try {
+    Import-Module Az.Accounts -ErrorAction Stop
+    Import-Module Az.Storage  -ErrorAction Stop
+}
+catch {
+    Write-Warning "Failed to import Az modules: $($_.Exception.Message)"
+}
+
 # Optional local debug: pause to allow attaching a debugger
 if ($env:ENABLE_DEBUG -eq 'true') {
     Write-Host "ENABLE_DEBUG=true → Waiting for debugger attach..." -ForegroundColor Yellow
