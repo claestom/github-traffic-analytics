@@ -83,12 +83,8 @@ az functionapp config appsettings set -g $rg -n $funcApp `
 
 # 7. Publish function code
 cd azure-function
-.\publish.ps1 $funcApp
+func azure functionapp publish $funcApp --nozip
 ```
-
-**Notes:**
-- The `publish.ps1` script sets the required `FUNCTIONS_WORKER_RUNTIME` environment variable to avoid publish errors.
-- For manual publish without the script: `$env:FUNCTIONS_WORKER_RUNTIME = "powershell"; func azure functionapp publish $funcApp --nozip`
 
 **What Gets Created:**
 - Storage Account (stores CSV in `metrics` container)
