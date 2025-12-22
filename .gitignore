@@ -31,6 +31,7 @@ outputs/
 # Power BI
 powerbi/*
 !powerbi/**/*.pbit
+!powerbi/*.pbit
 *.pbix
 *.pbix.tmp
 *.pbix.local
