@@ -28,6 +28,14 @@ build/
 # Outputs
 outputs/
 
+# Power BI
+powerbi/*
+!powerbi/**/*.pbit
+*.pbix
+*.pbix.tmp
+*.pbix.local
+*.pbit.tmp
+
 # Azure Function
 azure-function/.python_packages
 azure-function/obj/
