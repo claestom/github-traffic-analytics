@@ -84,3 +84,18 @@ func azure functionapp publish $funcApp --nozip
 - Function App (PowerShell 7.4, Consumption plan)
 - User-Assigned Managed Identity (secure storage access)
 - Application Insights (monitoring)
+
+---
+
+## Power BI Usage (SAS + .pbit)
+
+Use the template in `powerbi/` to visualize the CSV with your own storage.
+
+- Desktop setup:
+  - Open the `.pbit` → enter the SAS URL when prompted.
+  - Data source credentials: choose `Anonymous` (SAS is in the URL).
+  - Refresh to apply all existing transform steps.
+- Publish to Service:
+  - Dataset → Settings → Data source credentials → set to `Anonymous` for the blob domain.
+  - Enable Scheduled refresh (ensure SAS expiry is sufficient).
+- SAS scope: prefer blob-level SAS with `r` permission only; rotate with brief overlap.
