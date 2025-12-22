@@ -1,6 +1,6 @@
 # GitHub Metrics Tracker
 
-Track GitHub repository traffic (views and clones) over time. Collects daily metrics and stores them in CSV format.
+Track GitHub repository traffic (views and clones) over time. GitHub only exposes the last 14 days of insights; this tool grabs the T-13 day snapshot each night, appends it to a central CSV in your storage account, and preserves the history so you can analyze older traffic for free.
 
 ## What It Does
 
@@ -8,7 +8,7 @@ Track GitHub repository traffic (views and clones) over time. Collects daily met
 - Stores historical data (GitHub only keeps 14 days)
 - Tracks data from 13 days ago (ensuring complete data before GitHub purges it)
 - Outputs: CSV with date columns showing `views(clones)` per repository
-- Visualize metrics in a PowerBI report
+- Visualize metrics in a PowerBI report, with filters to drill into a single repo or any selection
 
 ![PBI report](./screenshots/dashboard.png)
 
