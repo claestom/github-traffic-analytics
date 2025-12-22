@@ -60,7 +60,8 @@ Deploy to Azure for fully automated daily collection at 11:50 PM CET.
 az login
 $rg = "<rg-name>"
 $location = "westeurope"
-
+```
+```powershell
 # 2. Create resource group
 az group create --name $rg --location $location
 
