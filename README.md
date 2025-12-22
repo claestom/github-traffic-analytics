@@ -91,6 +91,12 @@ func azure functionapp publish $funcApp --nozip
 
 Use the template in `powerbi/` to visualize the CSV with your own storage.
 
+**Generate a blob SAS:**
+
+![How to generate a blob SAS](screenshots/blobsashowto.png)
+
+- Scope: blob-level, permissions: `r` (read only), set expiry date.
+
 - Desktop setup:
   - Open the `.pbit` → enter the SAS URL when prompted.
   - Data source credentials: choose `Anonymous` (SAS is in the URL).
