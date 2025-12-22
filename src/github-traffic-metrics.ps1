@@ -140,8 +140,8 @@ try {
             
             # Look for views data for the specific target date (13 days ago)
             if ($viewsData.views.Count -gt 0) {
-                $targetViewDay = $viewsData.views | Where-Object {
-                    [DateTimeOffset]::Parse($_.timestamp, [System.Globalization.CultureInfo]::InvariantCulture).UtcDateTime.ToString('yyyy-MM-dd') -eq $targetDate
+                $targetViewDay = $viewsData.views | Where-Object { 
+                    [DateTime]::Parse($_.timestamp).ToString('yyyy-MM-dd') -eq $targetDate 
                 }
                 if ($targetViewDay) {
                     $viewCount = $targetViewDay.count
@@ -150,8 +150,8 @@ try {
             
             # Look for clones data for the specific target date (13 days ago)
             if ($clonesData.clones.Count -gt 0) {
-                $targetCloneDay = $clonesData.clones | Where-Object {
-                    [DateTimeOffset]::Parse($_.timestamp, [System.Globalization.CultureInfo]::InvariantCulture).UtcDateTime.ToString('yyyy-MM-dd') -eq $targetDate
+                $targetCloneDay = $clonesData.clones | Where-Object { 
+                    [DateTime]::Parse($_.timestamp).ToString('yyyy-MM-dd') -eq $targetDate 
                 }
                 if ($targetCloneDay) {
                     $cloneCount = $targetCloneDay.count
