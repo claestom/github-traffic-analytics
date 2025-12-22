@@ -83,7 +83,9 @@ az functionapp config appsettings set -g $rg -n $funcApp `
 
 # 7. Publish function code
 cd azure-function
-func azure functionapp publish $funcApp --nozip
+$env:FUNCTIONS_WORKER_RUNTIME = "powershell"
+$env:FUNCTIONS_WORKER_RUNTIME_VERSION = "7.4"
+func azure functionapp publish $funcApp --nozip --powershell 
 ```
 
 **What Gets Created:**
