@@ -8,6 +8,9 @@ Track GitHub repository traffic (views and clones) over time. Collects daily met
 - Stores historical data (GitHub only keeps 14 days)
 - Tracks data from 13 days ago (ensuring complete data before GitHub purges it)
 - Outputs: CSV with date columns showing `views(clones)` per repository
+- Visualize metrics in a PowerBI report
+
+![PBI report](./screenshots/dashboard.png)
 
 ## Usage Options
 
