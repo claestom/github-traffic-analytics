@@ -113,6 +113,7 @@ resource functionApp 'Microsoft.Web/sites@2023-01-01' = {
     httpsOnly: true
     publicNetworkAccess: 'Enabled'
     siteConfig: {
+      powerShellVersion: functionRuntimeVersion
       appSettings: [
         {
           name: 'AzureWebJobsStorage'
