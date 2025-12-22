@@ -56,29 +56,32 @@ Deploy to Azure for fully automated daily collection at 11:50 PM CET.
 
 **Deploy:**
 ```powershell
-# 1. Login and set variables
+# 1. Login to Azure
 az login
-$rg = "<rg-name>"
-$location = "westeurope"
 ```
 ```powershell
-# 2. Create resource group
+# 2. Set variables
+$rg = "<rg-name>"
+$location = "<region of deployment>"
+```
+```powershell
+# 3. Create resource group
 az group create --name $rg --location $location
 
-# 3. Deploy infrastructure (storage, function app, identity)
+# 4. Deploy infrastructure (storage, function app, identity)
 az deployment group create `
   --resource-group $rg `
   --template-file infra/main.bicep `
   --parameters infra/main.bicepparam
 
-# 4. Get function app name from outputs
+# 5. Get function app name from outputs
 $funcApp = az functionapp list -g $rg --query "[0].name" -o tsv
 
-# 5. Set GitHub credentials in the Azure Functions config
+# 6. Set GitHub credentials in the Azure Functions config
 az functionapp config appsettings set -g $rg -n $funcApp `
   --settings GITHUB_TOKEN="ghp_new_token" GITHUB_USERNAME="your_username"
 
-# 6. Publish function code
+# 7. Publish function code
 cd azure-function
 func azure functionapp publish $funcApp --nozip
 ```
