@@ -1,4 +1,4 @@
-# GitHub Metrics Tracker
+# GitHub Traffic Analytics
 
 Track GitHub repository traffic (views and clones) over time. GitHub only exposes the last 14 days of insights; this tool grabs the T-13 day snapshot each night, appends it to a central CSV in your storage account, and preserves the history so you can analyze older traffic for free.
 
@@ -18,8 +18,8 @@ Track GitHub repository traffic (views and clones) over time. GitHub only expose
 
 ```powershell
 # Clone and enter the repo
-git clone https://github.com/claestom/GitHub-metrics-tracker.git
-cd GitHub-metrics-tracker
+git clone https://github.com/claestom/github-traffic-analytics.git
+cd github-traffic-analytics
 ```
 
 ### Option 1: Local Script
@@ -98,7 +98,7 @@ func azure functionapp publish $funcApp --nozip --powershell
 
 ## Power BI Usage (SAS + .pbit)
 
-Use the template in `powerbi/` to visualize the CSV with your own storage.
+Use the template in [`powerbi/`](./powerbi/prodreport-realtime.pbit) to visualize the CSV with your own storage.
 
 **Generate a blob SAS:**
 

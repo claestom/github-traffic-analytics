@@ -41,3 +41,6 @@ powerbi/*
 azure-function/.python_packages
 azure-function/obj/
 local.settings.json
+
+# Articles
+article/
