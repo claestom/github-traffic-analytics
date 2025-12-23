@@ -10,7 +10,13 @@ Track GitHub repository traffic (views and clones) over time. GitHub only expose
 - Outputs: CSV with date columns showing `views(clones)` per repository
 - Visualize metrics in a PowerBI report, with filters to drill into a single repo or any selection
 
+##### Example: Overall insights across repositories
+
 ![PBI report](./screenshots/dashboard.png)
+
+##### Example: Traffic for two repos for a specific time period
+
+![selection](./screenshots/filteredrepos.png)
 
 ## Usage Options
 
