@@ -114,3 +114,9 @@ Use the template in `powerbi/` to visualize the CSV with your own storage.
   - Dataset → Settings → Data source credentials → set to `Anonymous` for the blob domain.
   - Enable Scheduled refresh (ensure SAS expiry is sufficient).
 - SAS scope: prefer blob-level SAS with `r` permission only; rotate with brief overlap.
+
+**Common Use Cases:**
+- Overall insights across repositories: use the line chart with `Date` on the X-axis and `Views`/`Clones` as values; leave the `Repository` slicer empty to see totals.
+- Single repository focus: select one repo in the `Repository` slicer; visuals filter to that repo’s traffic only.
+- Specific time period: use the `Date` slicer (Between) to limit visuals to a range (e.g., last 7 days).
+- Example: Understand activities after a release window: pick the repo in the slicer and set the `Date` slicer to the release week to analyze impact.
