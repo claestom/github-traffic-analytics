@@ -96,6 +96,10 @@ func azure functionapp publish $funcApp --nozip --powershell
 - User-Assigned Managed Identity (secure storage access)
 - Application Insights (monitoring)
 
+**Architecture:**
+
+![architecture](./screenshots/cloud-architecture.png)
+
 ---
 
 ## Power BI Usage (SAS + .pbit)
