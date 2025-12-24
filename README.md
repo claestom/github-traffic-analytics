@@ -98,7 +98,9 @@ func azure functionapp publish $funcApp --nozip --powershell
 
 **Architecture:**
 
-![architecture](./screenshots/cloud-architecture.png)
+<p align="center">
+  <img src="./screenshots/cloud-architecture.png" alt="architecture">
+</p>
 
 ---
 
