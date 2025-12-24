@@ -14,14 +14,6 @@ Track GitHub repository traffic (views and clones) over time. GitHub only expose
 
 ![PBI report](./screenshots/dashboard.png)
 
-##### Example: Traffic for two repos for a specific time period
-
-![selection](./screenshots/filteredrepos.png)
-
-##### Example: Analyze traffic after new release (use of time range and repo filter)
-
-![featurerelease](./screenshots/releaseexample.png)
-
 ## Usage Options
 
 ### Get the code
@@ -130,3 +122,15 @@ Use the template in [`powerbi/`](./powerbi/prodreport-realtime.pbit) to visualiz
 - Single repository focus: select one repo in the `Repository` slicer; visuals filter to that repo’s traffic only.
 - Specific time period: use the `Date` slicer (Between) to limit visuals to a range (e.g., last 7 days).
 - Example: Understand activities after a release window: pick the repo in the slicer and set the `Date` slicer to the release week to analyze impact.
+
+##### Example: Overall insights across repositories
+
+![PBI report](./screenshots/dashboard.png)
+
+##### Example: Traffic for two repos for a specific time period
+
+![selection](./screenshots/filteredrepos.png)
+
+##### Example: Analyze traffic after new release (use of time range and repo filter)
+
+![featurerelease](./screenshots/releaseexample.png)
