@@ -58,7 +58,7 @@ Deploy to Azure for fully automated daily collection at 11:50 PM CET.
 
 **Deploy:**
 
-Tip: Copy-paste the script into a text editor, fill in the values, then run it from inside the `github-traffic-analytics` folder.
+Tip: Copy-paste the script into a text editor, fill in the values, then run it as a whole from inside the `github-traffic-analytics` folder.
 
 ```powershell
 # 1. Login to Azure
