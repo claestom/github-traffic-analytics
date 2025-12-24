@@ -123,20 +123,22 @@ Use the template in [`powerbi/`](./powerbi/prodreport-realtime.pbit) to visualiz
   - Enable Scheduled refresh (ensure SAS expiry is sufficient).
 - SAS scope: prefer blob-level SAS with `r` permission only; rotate with brief overlap.
 
-**Common Use Cases:**
+## Common Use Cases
 - Overall insights across repositories: use the line chart with `Date` on the X-axis and `Views`/`Clones` as values; leave the `Repository` slicer empty to see totals.
 - Single repository focus: select one repo in the `Repository` slicer; visuals filter to that repo’s traffic only.
 - Specific time period: use the `Date` slicer (Between) to limit visuals to a range (e.g., last 7 days).
 - Example: Understand activities after a release window: pick the repo in the slicer and set the `Date` slicer to the release week to analyze impact.
 
-##### Example: Overall insights across repositories
+### Examples
+
+##### Overall insights across repositories
 
 ![PBI report](./screenshots/dashboard.png)
 
-##### Example: Traffic for two repos for a specific time period
+##### Traffic for two repos for a specific time period
 
 ![selection](./screenshots/filteredrepos.png)
 
-##### Example: Analyze traffic after new release (use of time range and repo filter)
+##### Analyze traffic after new release (use of time range and repo filter)
 
 ![featurerelease](./screenshots/releaseexample.png)
