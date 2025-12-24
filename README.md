@@ -23,31 +23,7 @@ Track GitHub repository traffic (views and clones) over time. GitHub only expose
 git clone https://github.com/claestom/github-traffic-analytics.git
 cd github-traffic-analytics
 ```
-
-### Option 1: Local Script
-
-Run manually or via scheduled task on your local machine.
-
-**Setup:**
-```powershell
-# 1. Create .env file in root directory
-GITHUB_TOKEN=ghp_your_token_here
-GITHUB_USERNAME=your_username
-
-# 2. Run the script
-cd src
-.\github-traffic-metrics.ps1
-```
-
-**Output:** `outputs/github-traffic-metrics.csv`
-
-**Schedule (optional):**
-- Windows: Task Scheduler
-- Linux/Mac: cron job
-
----
-
-### Option 2: Azure Functions (Automated)
+### Option 1: Azure Functions (Automated)
 
 Deploy to Azure for fully automated daily collection at 11:50 PM CET.
 
@@ -103,7 +79,26 @@ func azure functionapp publish $funcApp --nozip --powershell
   <img src="./screenshots/cloud-architecture.png" alt="architecture">
 </p>
 
----
+### Option 2: Local Script
+
+Run manually or via scheduled task on your local machine.
+
+**Setup:**
+```powershell
+# 1. Create .env file in root directory
+GITHUB_TOKEN=ghp_your_token_here
+GITHUB_USERNAME=your_username
+
+# 2. Run the script
+cd src
+.\github-traffic-metrics.ps1
+```
+
+**Output:** `outputs/github-traffic-metrics.csv`
+
+**Schedule (optional):**
+- Windows: Task Scheduler
+- Linux/Mac: cron job
 
 ## Power BI Usage (SAS + .pbit)
 
