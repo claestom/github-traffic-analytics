@@ -57,16 +57,17 @@ Deploy to Azure for fully automated daily collection at 11:50 PM CET.
 - PowerShell 7.4+
 
 **Deploy:**
+
+Tip: Copy-paste the script into a text editor, fill in the values, then run it from inside the `github-traffic-analytics` folder.
+
 ```powershell
 # 1. Login to Azure
 az login
-```
-```powershell
+
 # 2. Set variables
 $rg = "<rg-name>"
 $location = "<region of deployment>"
-```
-```powershell
+
 # 3. Create resource group
 az group create --name $rg --location $location
 
