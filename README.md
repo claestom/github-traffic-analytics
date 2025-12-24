@@ -18,6 +18,10 @@ Track GitHub repository traffic (views and clones) over time. GitHub only expose
 
 ![selection](./screenshots/filteredrepos.png)
 
+##### Example: Analyze traffic after new release (use of time range and repo filter)
+
+![featurerelease](./screenshots/releaseexample.png)
+
 ## Usage Options
 
 ### Get the code
