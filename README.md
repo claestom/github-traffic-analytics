@@ -7,7 +7,7 @@ Track GitHub repository traffic (views and clones) over time. GitHub only expose
 - Fetches **views** and **clones** data for all your public repositories
 - Stores historical data (GitHub only keeps 14 days)
 - Captures data daily before GitHub purges it, keeping a continuous history
-- Outputs: CSV with date columns showing `views(clones)` per repository
+- Outputs: CSV with date columns showing `views(clones)` per repository. [Sample output here.](./outputs/sample.csv)
 - Visualize metrics in a PowerBI report, with filters to drill into a single repo or any selection
 
 ![PBI report](./screenshots/dashboard.png)
