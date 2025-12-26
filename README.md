@@ -136,3 +136,12 @@ Use the template in [`powerbi/`](./powerbi/prodreport-realtime.pbit) to visualiz
 ##### Analyze traffic after new release (use of time range and repo filter)
 
 ![featurerelease](./screenshots/releaseexample.png)
+
+## Roadmap
+
+Planned enhancements to deepen traffic insights:
+
+- **Unique Views & Clones**: Track distinct visitors and unique IPs alongside total metrics to measure repeat engagement.
+- **Referring Websites**: Capture traffic sources (Twitter, Reddit, blogs, search engines) to measure campaign impact.
+
+The CSV-based approach ensures backward compatibility while unlocking richer insights.
