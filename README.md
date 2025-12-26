@@ -21,7 +21,7 @@ Track GitHub repository traffic (views and clones) over time. GitHub only expose
 git clone https://github.com/claestom/github-traffic-analytics.git
 cd github-traffic-analytics
 ```
-### Option 1: Azure Functions (Automated)
+### Option 1: Azure Functions (automated)
 
 Deploy to Azure for fully automated daily collection at 11:50 PM CET.
 
