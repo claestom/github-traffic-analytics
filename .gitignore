@@ -26,7 +26,9 @@ build/
 *.pyc
 
 # Outputs
-outputs/
+# Ignore everything in outputs except the sample CSV
+outputs/*
+!outputs/sample.csv
 
 # Power BI
 powerbi/*
