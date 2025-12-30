@@ -137,6 +137,16 @@ Use the template in [`powerbi/`](./powerbi/prodreport-realtime.pbit) to visualiz
 
 ![featurerelease](./screenshots/releaseexample.png)
 
+## Cost Estimate (Minimal)
+
+- **Azure Functions (Consumption)**: ~30s daily run stays in the free grant → ~$0. 
+- **Storage (Blob, LRS Hot)**: Few MB CSV + tiny egress → <$0.10/month.
+- **Power BI**: Desktop free; sharing in Service needs Pro/PPU (only if you publish).
+
+At low volume the stack is effectively free; costs grow with higher frequency, larger blobs, or publishing to Power BI Service.
+
+More information about pricing: [Azure services](https://azure.microsoft.com/en-us/pricing/) and [Power BI](https://www.microsoft.com/en-us/power-platform/products/power-bi/pricing?msockid=206a9e527e23630d0a4a8b6d7f6b627e).
+
 ## Roadmap
 
 Planned enhancements to deepen traffic insights:
