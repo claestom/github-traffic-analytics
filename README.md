@@ -137,7 +137,7 @@ Use the template in [`powerbi/`](./powerbi/prodreport-realtime.pbit) to visualiz
 
 ![featurerelease](./screenshots/releaseexample.png)
 
-## Cost Estimate (Minimal)
+## Cost Estimate
 
 - **Azure Functions (Consumption)**: ~30s daily run stays in the free grant → ~$0. 
 - **Storage (Blob, LRS Hot)**: Few MB CSV + tiny egress → <$0.10/month.
