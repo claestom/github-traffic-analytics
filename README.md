@@ -23,7 +23,7 @@ cd github-traffic-analytics
 ```
 ### Option 1: Azure Functions (automated)
 
-Deploy to Azure for fully automated daily collection at 12:15 AM CET.
+Deploy to Azure for fully automated daily collection at 7AM CET.
 
 **Prerequisites:**
 - Azure subscription
