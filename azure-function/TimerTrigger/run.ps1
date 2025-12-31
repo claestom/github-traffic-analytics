@@ -86,8 +86,8 @@ try {
     
     Write-Host "Processing $($publicRepos.Count) repositories" -ForegroundColor Cyan
     
-    # Use SAME date for all repositories: exactly 13 days ago
-    $targetDate = (Get-Date).AddDays(-13).ToString('yyyy-MM-dd')
+    # Use SAME date for all repositories: exactly 1 day ago
+    $targetDate = (Get-Date).AddDays(-1).ToString('yyyy-MM-dd')
     Write-Host "Collecting data for date: $targetDate" -ForegroundColor Yellow
     
     # Get storage account context using managed identity

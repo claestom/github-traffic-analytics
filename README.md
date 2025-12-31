@@ -1,12 +1,12 @@
 # GitHub Traffic Analytics
 
-Track GitHub repository traffic (views and clones) over time. GitHub only exposes the last 14 days; this tool captures the latest data each day before it’s purged, appends it to a central CSV in your storage account, and preserves the history so you can analyze older traffic for free.
+Track GitHub repository traffic (views and clones) over time. GitHub only exposes the last 14 days; this tool captures  data each day before it's purged, appends it to a central CSV in your storage account, and preserves the history so you can analyze older traffic for free.
 
 ## What It Does
 
 - Fetches **views** and **clones** data for all your public repositories
 - Stores historical data (GitHub only keeps 14 days) 
-- Captures data daily before GitHub purges it, keeping a continuous history
+- Captures yesterday's data (T-1) daily before GitHub purges it, keeping a continuous history
 - Outputs: CSV with date columns showing `views(clones)` per repository. [Sample output here.](./outputs/sample.csv)
 - Visualize metrics in a PowerBI report, with filters to drill into a single repo or any selection
 
@@ -23,7 +23,7 @@ cd github-traffic-analytics
 ```
 ### Option 1: Azure Functions (automated)
 
-Deploy to Azure for fully automated daily collection at 11:50 PM CET.
+Deploy to Azure for fully automated daily collection at 12:15 AM CET.
 
 **Prerequisites:**
 - Azure subscription
