@@ -6,7 +6,8 @@ Track GitHub repository traffic (views and clones) over time. GitHub only expose
 
 - Fetches **views** and **clones** data for all your public repositories
 - Stores historical data (GitHub only keeps 14 days) 
-- Captures yesterday's data (T-1) daily before GitHub purges it, keeping a continuous history
+- **First run**: Backfills 14 days of historical data (T-15 through T-2)
+- **Subsequent runs**: Captures data from 2 days ago (T-2) daily, ensuring that the metrics are updated in GitHub (often there is a delay)
 - Outputs: CSV with date columns showing `views(clones)` per repository. [Sample output here.](./outputs/sample.csv)
 - Visualize metrics in a PowerBI report, with filters to drill into a single repo or any selection
 
@@ -23,7 +24,7 @@ cd github-traffic-analytics
 ```
 ### Option 1: Azure Functions (automated)
 
-Deploy to Azure for fully automated daily collection at 7AM CET.
+Deploy to Azure for fully automated daily collection at 7 AM CET. On first run, the function backfills 14 days of history. Subsequent runs collect data from 2 days prior (T-2) to ensure data is captured before GitHub purges it.
 
 **Prerequisites:**
 - Azure subscription
@@ -32,7 +33,7 @@ Deploy to Azure for fully automated daily collection at 7AM CET.
 
 **Deploy:**
 
-Tip: Copy-paste the script into a text editor, fill in the values, then run it as a whole from inside the `github-traffic-analytics` folder.
+Tip: copy-paste the script into a text editor, fill in the values, then run it as a whole from inside the `github-traffic-analytics` folder.
 
 ```powershell
 # 1. Login to Azure
@@ -139,7 +140,7 @@ Use the template in [`powerbi/`](./powerbi/prodreport-realtime.pbit) to visualiz
 
 ## Cost Estimate
 
-- **Azure Functions (Consumption)**: ~30s daily run stays in the free grant → ~$0. 
+- **Azure Functions (Consumption)**: ~30s daily run (up to 2 minutes on first run with backfill) stays in the free grant → ~$0. 
 - **Storage (Blob, LRS Hot)**: Few MB CSV + tiny egress → <$0.10/month.
 - **Power BI**: Desktop free; sharing in Service needs Pro/PPU (only if you publish).
 
