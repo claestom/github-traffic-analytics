@@ -63,10 +63,6 @@ if (-not $GitHubUsername) {
     exit 1
 }
 
-Write-Host "==============================================================="
-Write-Host "       GitHub Repository Traffic Metrics - Azure Function      "
-Write-Host "==============================================================="
-Write-Host ""
 Write-Host "Timer trigger function executed at: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
 Write-Host "Fetching GitHub repositories for user: $GitHubUsername"
 
@@ -280,14 +276,11 @@ try {
     # Cleanup
     Remove-Item $tempCsvFile -Force
     
-    Write-Host ""
     Write-Host "Results saved to: $($StorageContainerName)/$($CsvFileName)"
-    Write-Host ""
     Write-Host "Summary for ${targetDate}:"
     Write-Host "  Total Repositories: $($publicRepos.Count)"
     Write-Host "  Total Views: $totalViewsForDay"  
     Write-Host "  Total Clones: $totalClonesForDay"
-    Write-Host ""
     Write-Host "Function execution completed successfully at: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
     
 } catch {
