@@ -1,8 +1,3 @@
-# Timer trigger function for GitHub metrics collection
-# Runs daily at 11:50 PM CET (23:50 CET)
-# Collects clones and views data for all public repositories
-# Stores results in Azure Storage Account
-
 param($myTimer)
 
 # Explicitly import required Az modules for this function
@@ -82,9 +77,8 @@ try {
     
     Write-Host "Processing $($publicRepos.Count) repositories"
     
-    # Use SAME date for all repositories: exactly 1 day ago
-    $targetDate = (Get-Date).AddDays(-1).ToString('yyyy-MM-dd')
-    Write-Host "Collecting data for date: $targetDate"
+    # Determine if this is the first run (no existing CSV)
+    $isFirstRun = $false
     
     # Get storage account context using managed identity
     try {
@@ -105,9 +99,12 @@ try {
     
     # Download existing CSV from storage if it exists
     $existingData = @{}
+    $csvExists = $false
     try {
         $blobContent = Get-AzStorageBlob -Container $StorageContainerName -Blob $CsvFileName -Context $storageContext -ErrorAction SilentlyContinue
         if ($blobContent) {
+            $csvExists = $true
+            $isFirstRun = $false
             Write-Host "Found existing CSV file in storage, downloading..."
             $tempFile = [System.IO.Path]::GetTempFileName()
             Get-AzStorageBlobContent -Container $StorageContainerName -Blob $CsvFileName -Context $storageContext -Destination $tempFile -Force | Out-Null
@@ -127,66 +124,92 @@ try {
                 }
             }
             Remove-Item $tempFile -Force
+        } else {
+            $isFirstRun = $true
+            Write-Host "No existing CSV found. Will backfill 14 days of historical data (t-15 through t-2)"
         }
     } catch {
-        Write-Host "No existing CSV found, creating new one"
+        $isFirstRun = $true
     }
     
-    $newDayData = @{}
+    # Determine which dates to collect based on first run vs. subsequent run
+    $datesToCollect = @()
+    if ($isFirstRun) {
+        # First run: collect 14 days of history (t-14 through t-1)
+        for ($i = 15; $i -ge 2; $i--) {
+            $datesToCollect += (Get-Date).AddDays(-$i).ToString('yyyy-MM-dd')
+        }
+    } else {
+        # Subsequent runs: only collect 2 days before (t-2)
+        $datesToCollect += (Get-Date).AddDays(-2).ToString('yyyy-MM-dd')
+        Write-Host "Daily append mode: collecting data for 1 day"
+    }
+    
+    Write-Host "Target date(s): $($datesToCollect -join ', ')"
+    
+    $newDayData = @{}  # Format: $newDayData[$date][$repoName] = "views(clones)"
     $totalViewsForDay = 0
     $totalClonesForDay = 0
     
-    foreach ($repo in $publicRepos) {
-        Write-Host "Processing repository: $($repo.name)"
+    foreach ($targetDate in $datesToCollect) {
+        Write-Host "Collecting data for date: $targetDate"
+        $newDayData[$targetDate] = @{}
         
-        try {
-            # Get traffic views (last 14 days)
-            $viewsUrl = "https://api.github.com/repos/$GitHubUsername/$($repo.name)/traffic/views"
-            $viewsData = Invoke-RestMethod -Uri $viewsUrl -Headers $headers -Method Get
+        foreach ($repo in $publicRepos) {
+            Write-Host "  Processing repository: $($repo.name)"
             
-            # Get traffic clones (last 14 days)  
-            $clonesUrl = "https://api.github.com/repos/$GitHubUsername/$($repo.name)/traffic/clones"
-            $clonesData = Invoke-RestMethod -Uri $clonesUrl -Headers $headers -Method Get
-            
-            $viewCount = 0
-            $cloneCount = 0
-            
-            # Look for views data for the specific target date (13 days ago)
-            if ($viewsData.views.Count -gt 0) {
-                $targetViewDay = $viewsData.views | Where-Object { 
-                    [DateTime]::Parse($_.timestamp).ToString('yyyy-MM-dd') -eq $targetDate 
+            try {
+                # Get traffic views (last 14 days)
+                $viewsUrl = "https://api.github.com/repos/$GitHubUsername/$($repo.name)/traffic/views"
+                $viewsData = Invoke-RestMethod -Uri $viewsUrl -Headers $headers -Method Get
+                
+                # Get traffic clones (last 14 days)  
+                $clonesUrl = "https://api.github.com/repos/$GitHubUsername/$($repo.name)/traffic/clones"
+                $clonesData = Invoke-RestMethod -Uri $clonesUrl -Headers $headers -Method Get
+                
+                $viewCount = 0
+                $cloneCount = 0
+                
+                # Look for views data for the specific target date
+                if ($viewsData.views.Count -gt 0) {
+                    $targetViewDay = $viewsData.views | Where-Object { 
+                        [DateTime]::Parse($_.timestamp).ToString('yyyy-MM-dd') -eq $targetDate 
+                    }
+                    if ($targetViewDay) {
+                        $viewCount = $targetViewDay.count
+                    }
                 }
-                if ($targetViewDay) {
-                    $viewCount = $targetViewDay.count
+                
+                # Look for clones data for the specific target date
+                if ($clonesData.clones.Count -gt 0) {
+                    $targetCloneDay = $clonesData.clones | Where-Object { 
+                        [DateTime]::Parse($_.timestamp).ToString('yyyy-MM-dd') -eq $targetDate 
+                    }
+                    if ($targetCloneDay) {
+                        $cloneCount = $targetCloneDay.count
+                    }
                 }
+                
+                # Format data as "views(clones)"
+                $formattedData = "$viewCount($cloneCount)"
+                $newDayData[$targetDate][$repo.name] = $formattedData
+                
+                # Only add to daily totals if this is the most recent date (for logging)
+                if ($targetDate -eq $datesToCollect[-1]) {
+                    $totalViewsForDay += $viewCount
+                    $totalClonesForDay += $cloneCount
+                }
+                
+                Write-Host "Views = $viewCount & Clones = $cloneCount"
+                
+                # Rate limiting - GitHub allows 5000 requests per hour
+                Start-Sleep -Milliseconds 100
+                
+            } catch {
+                Write-Warning "Failed to get traffic data for repository '$($repo.name)' on $targetDate : $($_.Exception.Message)"
+                Write-Host "    Views = 0 & Clones = 0"
+                $newDayData[$targetDate][$repo.name] = "0(0)"
             }
-            
-            # Look for clones data for the specific target date (13 days ago)
-            if ($clonesData.clones.Count -gt 0) {
-                $targetCloneDay = $clonesData.clones | Where-Object { 
-                    [DateTime]::Parse($_.timestamp).ToString('yyyy-MM-dd') -eq $targetDate 
-                }
-                if ($targetCloneDay) {
-                    $cloneCount = $targetCloneDay.count
-                }
-            }
-            
-            # Format data as "views(clones)"
-            $formattedData = "$viewCount($cloneCount)"
-            $newDayData[$repo.name] = $formattedData
-            
-            $totalViewsForDay += $viewCount
-            $totalClonesForDay += $cloneCount
-            
-            Write-Host "  Views = $viewCount & Clones = $cloneCount"
-            
-            # Rate limiting - GitHub allows 5000 requests per hour
-            Start-Sleep -Milliseconds 100
-            
-        } catch {
-            Write-Warning "Failed to get traffic data for repository '$($repo.name)': $($_.Exception.Message)"
-            Write-Host "  Views = 0 & Clones = 0"
-            $newDayData[$repo.name] = "0(0)"
         }
     }
     
@@ -194,14 +217,19 @@ try {
     $allRepositories = @($publicRepos.name) + @("TOTAL")
     $allDates = @()
     
-    # Get all unique dates from existing data and add new date
+    # Get all unique dates from existing data
     if ($existingData.Count -gt 0) {
         $existingDates = $existingData.Values | ForEach-Object { $_.Keys } | Sort-Object | Get-Unique
         $allDates += $existingDates
     }
-    if ($targetDate -notin $allDates) {
-        $allDates += $targetDate
+    
+    # Add newly collected dates (avoiding duplicates in daily append mode)
+    foreach ($date in $datesToCollect) {
+        if ($date -notin $allDates) {
+            $allDates += $date
+        }
     }
+    
     $allDates = $allDates | Sort-Object
     
     # Create the output data
@@ -220,9 +248,11 @@ try {
                 $dayTotalViews = 0
                 $dayTotalClones = 0
                 foreach ($repo in $publicRepos.name) {
-                    $repoData = if ($date -eq $targetDate -and $newDayData.ContainsKey($repo)) {
-                        $newDayData[$repo]
+                    $repoData = if ($newDayData.ContainsKey($date) -and $newDayData[$date].ContainsKey($repo)) {
+                        # Data from current run
+                        $newDayData[$date][$repo]
                     } elseif ($existingData.ContainsKey($repo) -and $existingData[$repo].ContainsKey($date)) {
+                        # Data from existing CSV
                         $existingData[$repo][$date]
                     } else {
                         "0(0)"
@@ -238,9 +268,11 @@ try {
                 $row | Add-Member -MemberType NoteProperty -Name $date -Value "$dayTotalViews($dayTotalClones)"
             } else {
                 # Regular repository data
-                $repoData = if ($date -eq $targetDate -and $newDayData.ContainsKey($repoName)) {
-                    $newDayData[$repoName]
+                $repoData = if ($newDayData.ContainsKey($date) -and $newDayData[$date].ContainsKey($repoName)) {
+                    # Data from current run
+                    $newDayData[$date][$repoName]
                 } elseif ($existingData.ContainsKey($repoName) -and $existingData[$repoName].ContainsKey($date)) {
+                    # Data from existing CSV
                     $existingData[$repoName][$date]
                 } else {
                     "0(0)"
@@ -277,10 +309,17 @@ try {
     Remove-Item $tempCsvFile -Force
     
     Write-Host "Results saved to: $($StorageContainerName)/$($CsvFileName)"
-    Write-Host "Summary for ${targetDate}:"
-    Write-Host "  Total Repositories: $($publicRepos.Count)"
-    Write-Host "  Total Views: $totalViewsForDay"  
-    Write-Host "  Total Clones: $totalClonesForDay"
+    
+    if ($isFirstRun) {
+        Write-Host "Backfilled $($datesToCollect.Count) days of historical data"
+        Write-Host "Date range: $($datesToCollect[0]) to $($datesToCollect[-1])"
+    } else {
+        Write-Host "Summary for $($datesToCollect[-1]):"
+        Write-Host "  Total Repositories: $($publicRepos.Count)"
+        Write-Host "  Total Views: $totalViewsForDay"
+        Write-Host "  Total Clones: $totalClonesForDay"
+    }
+    
     Write-Host "Function execution completed successfully at: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
     
 } catch {
