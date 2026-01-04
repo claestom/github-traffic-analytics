@@ -10,7 +10,7 @@ Track GitHub repository traffic (views and clones) over time. GitHub only expose
 - Outputs: CSV with date columns showing `views(clones)` per repository. [Sample output here.](./outputs/sample.csv)
 - Visualize metrics in a PowerBI report, with filters to drill into a single repo or any selection
 
-![PBI report](./screenshots/dashboard.png)
+![PBI report](./imgs/dashboard.png)
 
 ## Usage Options
 
@@ -74,7 +74,7 @@ func azure functionapp publish $funcApp --nozip --powershell
 **Architecture:**
 
 <p align="center">
-  <img src="./screenshots/cloud-architecture.png" alt="architecture">
+  <img src="./imgs/cloud-architecture.png" alt="architecture">
 </p>
 
 ### Option 2: Local Script
@@ -104,7 +104,7 @@ Use the template in [`powerbi/`](./powerbi/prodreport-realtime.pbit) to visualiz
 
 **Generate a blob SAS:**
 
-![How to generate a blob SAS](screenshots/blobsashowto.png)
+![How to generate a blob SAS](./imgs/blobsashowto.png)
 
 - Scope: blob-level, permissions: `r` (read only), set expiry date.
 
@@ -127,15 +127,15 @@ Use the template in [`powerbi/`](./powerbi/prodreport-realtime.pbit) to visualiz
 
 ##### Overall insights across repositories
 
-![PBI report](./screenshots/dashboard.png)
+![PBI report](./imgs/dashboard.png)
 
 ##### Traffic for two repos for a specific time period
 
-![selection](./screenshots/filteredrepos.png)
+![selection](./imgs/filteredrepos.png)
 
 ##### Analyze traffic after new release (use of time range and repo filter)
 
-![featurerelease](./screenshots/releaseexample.png)
+![featurerelease](./imgs/releaseexample.png)
 
 ## Cost Estimate
 
