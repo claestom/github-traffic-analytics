@@ -1,6 +1,6 @@
 # GitHub Traffic Analytics
 
-Track GitHub repository traffic (views and clones) over time. GitHub only exposes the last 14 days; this tool captures  data each day before it's purged, appends it to a central CSV in your storage account, and preserves the history so you can analyze older traffic for free.
+Track GitHub repository traffic (views and clones) over time. GitHub only exposes the last 14 days; this tool captures  data each day, appends it to a central CSV in your storage account, and preserves the history so you can analyze older traffic for free.
 
 ## What It Does
 
@@ -24,7 +24,7 @@ cd github-traffic-analytics
 ```
 ### Option 1: Azure Functions (automated)
 
-Deploy to Azure for fully automated daily collection at 7 AM CET. On first run, the function backfills 14 days of history. Subsequent runs collect data from 2 days prior (T-2) to ensure data is captured before GitHub purges it.
+Deploy to Azure for fully automated daily collection at 7 AM CET. On first run - when no CSV gets detected, the function backfills 14 days of history. Subsequent runs collect data from 2 days prior (T-2) to ensure data is captured before GitHub purges it.
 
 **Prerequisites:**
 - Azure subscription
@@ -33,12 +33,12 @@ Deploy to Azure for fully automated daily collection at 7 AM CET. On first run, 
 
 **Deploy:**
 
-Tip: copy-paste the script into a text editor, fill in the values, then run it as a whole from inside the `github-traffic-analytics` folder.
-
 ```powershell
 # 1. Login to Azure
 az login
-
+```
+Tip: copy-paste the script into a text editor, fill in the values, then run it as a whole from inside the `github-traffic-analytics` folder.
+```powershell
 # 2. Set variables
 $rg = "<rg-name>"
 $location = "<region of deployment>"
@@ -71,6 +71,14 @@ func azure functionapp publish $funcApp --nozip --powershell
 - Function App (PowerShell 7.4, Consumption plan)
 - User-Assigned Managed Identity (secure storage access)
 - Application Insights (monitoring)
+
+(optional) **Once deployed**:
+
+Test the Azure Function:
+
+![testfunction](./imgs/testfunction.png)
+
+Explained [here](https://learn.microsoft.com/en-us/azure/azure-functions/functions-manually-run-non-http?tabs=azure-portal#call-the-function) as well.
 
 **Architecture:**
 
@@ -141,7 +149,7 @@ Use the template in [`powerbi/`](./powerbi/prodreport-realtime.pbit) to visualiz
 ## Cost Estimate
 
 - **Azure Functions (Consumption)**: ~30s daily run (up to 2 minutes on first run with backfill) stays in the free grant → ~$0. 
-- **Storage (Blob, LRS Hot)**: Few MB CSV + tiny egress → <$0.10/month.
+- **Storage (Blob, LRS, Hot)**: Few MB CSV + tiny egress → <$0.10/month.
 - **Power BI**: Desktop free; sharing in Service needs Pro/PPU (only if you publish).
 
 At low volume the stack is effectively free; costs grow with higher frequency, larger blobs, or publishing to Power BI Service.
