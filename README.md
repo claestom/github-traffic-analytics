@@ -103,7 +103,7 @@ cd src
 
 Use the template in [`powerbi/`](./powerbi/prodreport-realtime.pbit) to visualize the CSV with your own storage.
 
-**Generate a blob SAS:**
+**Generate a blob SAS** ([how to do it](https://learn.microsoft.com/en-us/azure/ai-services/Translator/document-translation/how-to-guides/create-sas-tokens?tabs=Containers))
 
 ![How to generate a blob SAS](./imgs/blobsashowto.png)
 
