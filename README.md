@@ -159,4 +159,4 @@ The CSV-based approach ensures backward compatibility while unlocking richer ins
 
 ## Contributions
 
-Contributions are always appreciated! Open an issue to report bugs or suggest features, or submit a PR to improve the code.
+Contributions are always appreciated! Open an issue to report bugs or suggest features, or submit a PR to improve the solution.
