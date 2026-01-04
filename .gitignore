@@ -46,3 +46,6 @@ local.settings.json
 
 # Articles
 article/
+
+# Backup
+backup/
