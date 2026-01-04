@@ -16,7 +16,7 @@ catch {
 
 # Optional local debug: pause to allow attaching a debugger
 if ($env:ENABLE_DEBUG -eq 'true') {
-    Write-Host "ENABLE_DEBUG=true → Waiting for debugger attach..." -ForegroundColor Yellow
+    Write-Host "ENABLE_DEBUG=true → Waiting for debugger attach..."
     Wait-Debugger
 }
 
@@ -27,7 +27,7 @@ try {
     } else {
         Connect-AzAccount -Identity | Out-Null
     }
-    Write-Host "Authenticated to Azure via managed identity" -ForegroundColor Green
+    Write-Host "Authenticated to Azure via managed identity"
 } catch {
     Write-Warning "Managed identity authentication failed: $($_.Exception.Message)"
 }
@@ -37,7 +37,7 @@ $subscriptionId = $env:AZURE_SUBSCRIPTION_ID
 if ($subscriptionId) {
     try {
         Set-AzContext -Subscription $subscriptionId | Out-Null
-        Write-Host "Set Az context to subscription: $subscriptionId" -ForegroundColor Green
+        Write-Host "Set Az context to subscription: $subscriptionId"
     } catch {
         Write-Warning "Failed to set Az context: $($_.Exception.Message)"
     }
@@ -63,12 +63,12 @@ if (-not $GitHubUsername) {
     exit 1
 }
 
-Write-Host "===============================================================" -ForegroundColor Blue
-Write-Host "       GitHub Repository Traffic Metrics - Azure Function      " -ForegroundColor White
-Write-Host "===============================================================" -ForegroundColor Blue
+Write-Host "==============================================================="
+Write-Host "       GitHub Repository Traffic Metrics - Azure Function      "
+Write-Host "==============================================================="
 Write-Host ""
-Write-Host "Timer trigger function executed at: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" -ForegroundColor Green
-Write-Host "Fetching GitHub repositories for user: $GitHubUsername" -ForegroundColor Green
+Write-Host "Timer trigger function executed at: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+Write-Host "Fetching GitHub repositories for user: $GitHubUsername"
 
 try {
     # GitHub API headers
@@ -84,11 +84,11 @@ try {
     
     $publicRepos = $repositories | Where-Object { $_.private -eq $false -and $_.owner.login -eq $GitHubUsername -and $_.fork -eq $false }
     
-    Write-Host "Processing $($publicRepos.Count) repositories" -ForegroundColor Cyan
+    Write-Host "Processing $($publicRepos.Count) repositories"
     
     # Use SAME date for all repositories: exactly 1 day ago
     $targetDate = (Get-Date).AddDays(-1).ToString('yyyy-MM-dd')
-    Write-Host "Collecting data for date: $targetDate" -ForegroundColor Yellow
+    Write-Host "Collecting data for date: $targetDate"
     
     # Get storage account context using managed identity
     try {
@@ -100,7 +100,7 @@ try {
             $storageToken = Get-AzAccessToken -ResourceUrl 'https://storage.azure.com/'
             if (-not $storageToken.Token) { throw "Failed to acquire storage access token" }
             $storageContext = New-AzStorageContext -StorageAccountName $StorageAccountName -Token $storageToken.Token
-            Write-Host "Established storage context using access token" -ForegroundColor Green
+            Write-Host "Established storage context using access token"
         } catch {
             Write-Error "Failed to create storage context: $($_.Exception.Message)"
             throw
@@ -112,7 +112,7 @@ try {
     try {
         $blobContent = Get-AzStorageBlob -Container $StorageContainerName -Blob $CsvFileName -Context $storageContext -ErrorAction SilentlyContinue
         if ($blobContent) {
-            Write-Host "Found existing CSV file in storage, downloading..." -ForegroundColor Cyan
+            Write-Host "Found existing CSV file in storage, downloading..."
             $tempFile = [System.IO.Path]::GetTempFileName()
             Get-AzStorageBlobContent -Container $StorageContainerName -Blob $CsvFileName -Context $storageContext -Destination $tempFile -Force | Out-Null
             
@@ -133,7 +133,7 @@ try {
             Remove-Item $tempFile -Force
         }
     } catch {
-        Write-Host "No existing CSV found, creating new one" -ForegroundColor Yellow
+        Write-Host "No existing CSV found, creating new one"
     }
     
     $newDayData = @{}
@@ -141,7 +141,7 @@ try {
     $totalClonesForDay = 0
     
     foreach ($repo in $publicRepos) {
-        Write-Host "Processing repository: $($repo.name)" -ForegroundColor Yellow
+        Write-Host "Processing repository: $($repo.name)"
         
         try {
             # Get traffic views (last 14 days)
@@ -182,14 +182,14 @@ try {
             $totalViewsForDay += $viewCount
             $totalClonesForDay += $cloneCount
             
-            Write-Host "  Views = $viewCount & Clones = $cloneCount" -ForegroundColor Gray
+            Write-Host "  Views = $viewCount & Clones = $cloneCount"
             
             # Rate limiting - GitHub allows 5000 requests per hour
             Start-Sleep -Milliseconds 100
             
         } catch {
             Write-Warning "Failed to get traffic data for repository '$($repo.name)': $($_.Exception.Message)"
-            Write-Host "  Views = 0 & Clones = 0" -ForegroundColor Gray
+            Write-Host "  Views = 0 & Clones = 0"
             $newDayData[$repo.name] = "0(0)"
         }
     }
@@ -274,24 +274,24 @@ try {
     $outputData | Export-Csv -Path $tempCsvFile -NoTypeInformation -Encoding UTF8
     
     # Upload CSV to Azure Storage
-    Write-Host "Uploading CSV to Azure Storage..." -ForegroundColor Cyan
+    Write-Host "Uploading CSV to Azure Storage..."
     Set-AzStorageBlobContent -File $tempCsvFile -Container $StorageContainerName -Blob $CsvFileName -Context $storageContext -Force | Out-Null
     
     # Cleanup
     Remove-Item $tempCsvFile -Force
     
     Write-Host ""
-    Write-Host "Results saved to: $($StorageContainerName)/$($CsvFileName)" -ForegroundColor Green
+    Write-Host "Results saved to: $($StorageContainerName)/$($CsvFileName)"
     Write-Host ""
-    Write-Host "Summary for ${targetDate}:" -ForegroundColor Cyan
-    Write-Host "  Total Repositories: $($publicRepos.Count)" -ForegroundColor White
-    Write-Host "  Total Views: $totalViewsForDay" -ForegroundColor White  
-    Write-Host "  Total Clones: $totalClonesForDay" -ForegroundColor White
+    Write-Host "Summary for ${targetDate}:"
+    Write-Host "  Total Repositories: $($publicRepos.Count)"
+    Write-Host "  Total Views: $totalViewsForDay"  
+    Write-Host "  Total Clones: $totalClonesForDay"
     Write-Host ""
-    Write-Host "Function execution completed successfully at: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" -ForegroundColor Green
+    Write-Host "Function execution completed successfully at: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
     
 } catch {
     Write-Error "Failed to fetch repository data: $($_.Exception.Message)"
-    Write-Host "Stack trace: $($_.Exception.StackTrace)" -ForegroundColor Red
+    Write-Host "Stack trace: $($_.Exception.StackTrace)"
     exit 1
 }
