@@ -103,6 +103,13 @@ cd src
 
 **Output:** `outputs/github-traffic-metrics.csv`
 
+**Linux users**: 
+
+```bash
+sudo apt-get install -y powershell
+pwsh ./src/github-traffic-metrics.ps1
+```
+
 **Schedule (optional):**
 - Windows: Task Scheduler
 - Linux/Mac: cron job
