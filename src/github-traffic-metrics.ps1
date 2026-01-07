@@ -165,14 +165,21 @@ try {
                 if ($viewsData.views.Count -gt 0) {
                     $targetViewDay = $viewsData.views | Where-Object {
                         try {
-                            # GitHub API returns ISO 8601 format: 2025-12-25T00:00:00Z
-                            if ($_.timestamp -match '^\d{4}-\d{2}-\d{2}') {
-                                # Extract just the date part (first 10 characters)
-                                $dateStr = $_.timestamp.Substring(0, 10)
+                            # Convert timestamp to DateTime if it's a string, otherwise it's already a DateTime object
+                            $timestampDate = if ($_.timestamp -is [DateTime]) {
+                                $_.timestamp
+                            } elseif ($_.timestamp -is [string]) {
+                                if ($_.timestamp -match '^\d{4}-\d{2}-\d{2}') {
+                                    [DateTime]::Parse($_.timestamp.Substring(0, 10))
+                                } else {
+                                    [DateTime]::Parse($_.timestamp)
+                                }
                             } else {
-                                $parsedDate = [DateTime]::Parse($_.timestamp)
-                                $dateStr = $parsedDate.ToString('yyyy-MM-dd')
+                                $_.timestamp
                             }
+                            
+                            # Compare date parts only (ignore time)
+                            $dateStr = $timestampDate.ToString('yyyy-MM-dd')
                             $dateStr -eq $targetDate
                         } catch {
                             $false
@@ -187,14 +194,21 @@ try {
                 if ($clonesData.clones.Count -gt 0) {
                     $targetCloneDay = $clonesData.clones | Where-Object {
                         try {
-                            # GitHub API returns ISO 8601 format: 2025-12-25T00:00:00Z
-                            if ($_.timestamp -match '^\d{4}-\d{2}-\d{2}') {
-                                # Extract just the date part (first 10 characters)
-                                $dateStr = $_.timestamp.Substring(0, 10)
+                            # Convert timestamp to DateTime if it's a string, otherwise it's already a DateTime object
+                            $timestampDate = if ($_.timestamp -is [DateTime]) {
+                                $_.timestamp
+                            } elseif ($_.timestamp -is [string]) {
+                                if ($_.timestamp -match '^\d{4}-\d{2}-\d{2}') {
+                                    [DateTime]::Parse($_.timestamp.Substring(0, 10))
+                                } else {
+                                    [DateTime]::Parse($_.timestamp)
+                                }
                             } else {
-                                $parsedDate = [DateTime]::Parse($_.timestamp)
-                                $dateStr = $parsedDate.ToString('yyyy-MM-dd')
+                                $_.timestamp
                             }
+                            
+                            # Compare date parts only (ignore time)
+                            $dateStr = $timestampDate.ToString('yyyy-MM-dd')
                             $dateStr -eq $targetDate
                         } catch {
                             $false
