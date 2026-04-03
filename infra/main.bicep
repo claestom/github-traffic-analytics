@@ -12,7 +12,7 @@ var containerName = 'metrics'
 var csvFileName = 'github-traffic-metrics.csv'
 
 // Function App
-var functionAppName = 'func-${projectName}-${environment}'
+var functionAppName = 'func-${projectName}-${environment}-${uniqueString(resourceGroup().id, subscription().subscriptionId)}'
 var appServicePlanName = 'plan-${projectName}-${environment}'
 var applicationInsightsName = 'ai-${projectName}-${environment}'
 var logAnalyticsWorkspaceName = 'log-${projectName}-${environment}'
